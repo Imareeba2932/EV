@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>feature</title>
+    <style>
+    /* ===== CSS RESET (minimal) ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; color: #f5f5f5; background: #0b0b0b; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== THEME ===== */
+    :root{
+      --bg:#0b0b0b;          /* black */
+      --fg:#f5f5f5;          /* white */
+      --muted:#bdbdbd;       /* soft gray for text */
+      --card:#111;           /* dark card */
+      --line:#1d1d1d;        /* grid line */
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius: 20px;
+    }
+
+    /* ===== BACKGROUND ANIMATION (subtle, monochrome) ===== */
+    .bg-layer::before,
+    .bg-layer::after{
+    content:""; position: fixed; inset: 0; z-index: -2; pointer-events:none;
+    }
+    /* Moving diagonal grid */
+    .bg-layer::before{
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0)) ,
+        repeating-linear-gradient(45deg, var(--line) 0 2px, transparent 2px 28px);
+    animation: drift 35s linear infinite;
+    opacity:.9;
+    }
+    /* Slow pulsing radial glow */
+    .bg-layer::after{
+    background:
+        radial-gradient(1200px 800px at 10% 20%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(1000px 600px at 80% 70%, rgba(255,255,255,.05), transparent 60%);
+    animation: pulse 14s ease-in-out infinite;
+    }
+    @keyframes drift { to { background-position: 1000px 1000px, 600px 600px; } }
+    @keyframes pulse { 0%,100%{opacity:.45} 50%{opacity:.8} }
+
+    /* ===== UTILITIES ===== */
+    .container{ max-width: 1200px; margin-inline: auto; padding: 24px; }
+    .grid{ display: grid; gap: 22px; }
+    .center{ display: grid; place-items: center; }
+    .btn{ display:inline-grid; place-items:center; padding: 14px 22px; border:1.5px solid #fff; border-radius: 999px; font-weight: 600; letter-spacing:.3px; transition: transform .2s ease, background .2s ease, color .2s ease; }
+    .btn:hover{ transform: translateY(-2px); background:#fff; color:#000; }
+    .muted{ color: var(--muted); }
+
+    /* ===== HEADER / NAV ===== */
+    header{ position: sticky; top:0; backdrop-filter: blur(8px); background: linear-gradient(to bottom, rgba(11,11,11,.95), rgba(11,11,11,.65)); border-bottom: 1px solid rgba(255,255,255,.06); z-index:10; }
+    .nav{ display:flex; align-items:center; justify-content:space-between; gap:18px; }
+    .brand{ display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.6px; }
+    .logo{ width:34px; height:34px; border-radius:10px; background: conic-gradient(from 0deg, #fff 0 25%, #000 25% 50%, #fff 50% 75%, #000 75% 100%); border:1px solid #fff; box-shadow: var(--shadow); animation: spin 10s linear infinite; }
+    @keyframes spin { to { transform: rotate(1turn); } }
+    nav a{ padding: 10px 14px; border-radius: 999px; border:1px solid transparent; }
+    nav a:hover{ border-color:#fff; }
+
+    /* ===== HERO ===== */
+    .hero{ padding: clamp(48px, 8vw, 120px) 0 64px; position: relative; overflow:hidden; }
+    .hero h1{ font-size: clamp(2.3rem, 6vw, 4.2rem); line-height: 1.05; margin: 0 0 16px; letter-spacing: .5px; }
+    .hero p{ font-size: clamp(1rem, 1.6vw, 1.2rem); margin: 0 0 28px; color: var(--muted); max-width: 70ch; }
+    .hero-cta{ display:flex; gap:12px; flex-wrap: wrap; }
+
+    /* Decorative animated lines */
+    .lines{ position:absolute; inset: -20% -10% auto -10%; height: 60vh; z-index:-1; opacity:.45; filter: blur(0.1px); }
+    .line{ position:absolute; left:0; right:0; height:1px; background: linear-gradient(90deg, transparent, #fff, transparent); opacity:.35; animation: sweep 8s ease-in-out infinite; }
+    .line:nth-child(1){ top:10%; animation-delay: 0s; }
+    .line:nth-child(2){ top:25%; animation-delay: .6s; }
+    .line:nth-child(3){ top:40%; animation-delay: 1.2s; }
+    .line:nth-child(4){ top:55%; animation-delay: 1.8s; }
+    .line:nth-child(5){ top:70%; animation-delay: 2.4s; }
+    @keyframes sweep { 0%{ transform: translateX(-30%); opacity:.1 } 50%{ opacity:.65 } 100%{ transform: translateX(30%); opacity:.1 } }
+
+    /* ===== FEATURE CARDS ===== */
+    .features{ padding: 36px 0 72px; }
+    .cards{ grid-template-columns: repeat(12, 1fr); }
+    .card{ grid-column: span 12; background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .card::after{ content:""; position:absolute; inset: -1px; background: radial-gradient(400px 200px at 10% 0%, rgba(255,255,255,.06), transparent 40%); pointer-events:none; }
+    .card h3{ margin: 0 0 8px; font-size: 1.15rem; }
+    .card p{ margin: 0; color: var(--muted); }
+    .card:hover{ transform: translateY(-3px); transition: transform .2s ease; }
+    @media (min-width: 720px){ .card{ grid-column: span 6; } }
+    @media (min-width: 1024px){ .card{ grid-column: span 4; } }
+
+    /* ===== STATS STRIP ===== */
+    .stats{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin: 10px 0 36px; }
+    .stat{ background:#0f0f0f; border:1px solid rgba(255,255,255,.07); border-radius: var(--radius); padding: 18px; text-align:center; box-shadow: var(--shadow); }
+    .stat .num{ font-size: clamp(1.6rem, 3.2vw, 2.4rem); font-weight:800; letter-spacing:.5px; }
+    .stat .label{ color: var(--muted); }
+    @media (min-width: 768px){ .stats{ grid-template-columns: repeat(4, 1fr); } }
+
+    /* ===== FOOTER ===== */
+    footer{ border-top: 1px solid rgba(255,255,255,.08); padding: 28px 0 60px; color: var(--muted); }
+
+    /* ===== ON-LOAD ANIMATIONS ===== */
+    .fade-up{ opacity:0; transform: translateY(12px); animation: fadeUp .8s ease forwards; }
+    .fade-up.d1{ animation-delay: .1s; } .fade-up.d2{ animation-delay: .2s; } .fade-up.d3{ animation-delay: .3s; } .fade-up.d4{ animation-delay: .4s; }
+    @keyframes fadeUp{ to{ opacity:1; transform: translateY(0); } }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+    .logo, .bg-layer::before, .bg-layer::after, .line, .fade-up { animation: none !important; }
+    }
+</style>
+</head>
+<body>
+
+    <header>
+    <div class="container nav">
+    <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>EVIoT<span style="font-weight:400"> • Predict</span></span>
+    </div>
+    <nav aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#get-started" class="btn" style="padding:10px 16px">Get Started</a>
+    </nav>
+    </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero container">
+    <div class="lines" aria-hidden="true">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    </div>
+    
+<!-- ===== FEATURES ===== -->
+<section id="features" class="features container">
+    <div class="grid cards">
+        <article class="card fade-up" data-target="battery" onclick="showGraph('battery')">
+            <h3>Battery Intelligence</h3>
+            <p>Model SoC/SoH, temperature, voltage & cycles to forecast degradation.</p>
+        </article>
+        <article class="card fade-up d1" data-target="motor" onclick="showGraph('motor')">
+            <h3>Motor & Drivetrain</h3>
+            <p>Monitor torque, RPM, vibration & power to catch bearing wear and thermal stress early.</p>
+        </article>
+        <article class="card fade-up d2" data-target="braking" onclick="showGraph('braking')">
+            <h3>Braking Health</h3>
+            <p>Track pad wear, pressure & regen efficiency to keep stopping power reliable.</p>
+        </article>
+        <article class="card fade-up d3" data-target="tires" onclick="showGraph('tires')">
+            <h3>Tires & Suspension</h3>
+            <p>Use pressure, temperature & load metrics to predict wear and prevent failures.</p>
+        </article>
+        <article class="card fade-up d4" data-target="forecast" onclick="showGraph('forecast')">
+            <h3>Multi‑Horizon Forecasts</h3>
+            <p>Estimate RUL & TTF and compute health scores for proactive maintenance windows.</p>
+        </article>
+        <article class="card fade-up d4" data-target="federated" onclick="showGraph('federated')">
+            <h3>Federated Learning Ready</h3>
+            <p>Train collaboratively across fleets without sharing raw data—privacy first.</p>
+        </article>
+    </div>
+</section>
+
+</style>
+
+<script>
+// Show modal
+function showGraph(id){
+const modal = document.getElementById(id);
+modal.style.display = "flex";
+}
+
+// Close modal
+function closeGraph(id){
+  const modal = document.getElementById(id);
+  modal.style.display = "none";
+}
+
+// Click outside image to close
+document.querySelectorAll('.graph-modal').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if(e.target === modal) modal.style.display = "none";
+  });
+});
+</script>
+
+</body>
+</html>

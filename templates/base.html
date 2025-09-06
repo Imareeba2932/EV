@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home</title>
+    <style>
+    header{ position: sticky; top:0; backdrop-filter: blur(8px); background: linear-gradient(to bottom, rgba(11,11,11,.95), rgba(11,11,11,.65)); border-bottom: 1px solid rgba(255,255,255,.06); z-index:10; }
+    .nav{ display:flex; align-items:center; justify-content:space-between; gap:18px; }
+    .brand{ display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.6px; }
+    .logo{ width:34px; height:34px; border-radius:10px; background: conic-gradient(from 0deg, #fff 0 25%, #000 25% 50%, #fff 50% 75%, #000 75% 100%); border:1px solid #fff; box-shadow: var(--shadow); animation: spin 10s linear infinite; }
+    @keyframes spin { to { transform: rotate(1turn); } }
+    nav a{ padding: 10px 14px; border-radius: 999px; border:1px solid transparent; }
+    nav a:hover{ border-color:#fff; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container nav">
+    <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>EVIoT<span style="font-weight:400"> • Predict</span></span>
+    </div>
+    <nav aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="\templates\about.html">About</a>
+        <a href="#get-started" class="btn" style="padding:10px 16px">Get Started</a>
+    </nav>
+    </div>
+</header>
+</body>
+</html>

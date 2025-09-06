@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVIoT Predict — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#ffffffde;
+      --muted:#9aa0a6;
+      --brand:#00e5ff;
+      --brand2:#9b5cff;
+      --card:#0b0b0f;
+      --border: #1a1a1f;
+      --glow: 0 0 20px rgba(0,229,255,.25), 0 0 40px rgba(155,92,255,.15);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--fg); background:var(--bg); overflow-x:hidden;
+    }
+    a{color:var(--fg); text-decoration:none}
+
+    /* ===== Background Animation (stars + aurora) ===== */
+    .bg{
+      position:fixed; inset:0; z-index:-2; background:#000;
+      overflow:hidden;
+    }
+    .stars, .twinkle{
+      position:absolute; inset:0; background-repeat:repeat; pointer-events:none; opacity:.5;
+      animation: drift 120s linear infinite;
+    }
+    .stars{background-image:radial-gradient(2px 2px at 20px 30px, #fff, transparent 40%),
+                                radial-gradient(1px 1px at 100px 80px, #fff, transparent 40%),
+                                radial-gradient(1px 1px at 200px 130px, #fff, transparent 40%),
+                                radial-gradient(2px 2px at 250px 60px, #fff, transparent 40%);
+          background-size: 300px 300px; filter:blur(.3px);}
+    .twinkle{background-image:radial-gradient(1px 1px at 30px 50px, rgba(255,255,255,.7), transparent 40%),
+                                radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.6), transparent 40%),
+                                radial-gradient(2px 2px at 160px 200px, rgba(255,255,255,.8), transparent 40%);
+             background-size: 200px 200px; animation-duration:160s; mix-blend-mode:screen;}
+    .aurora{
+      position:absolute; inset:-20% -10%; z-index:-1; filter: blur(100px) saturate(140%);
+      background: 
+        radial-gradient(60% 40% at 20% 30%, rgba(0,229,255,.12), transparent 60%),
+        radial-gradient(50% 35% at 80% 20%, rgba(155,92,255,.10), transparent 60%),
+        radial-gradient(40% 40% at 70% 80%, rgba(0,229,255,.08), transparent 60%);
+      animation: float 18s ease-in-out infinite alternate;
+    }
+    @keyframes drift { from{transform:translateY(0)} to{transform:translateY(-300px)} }
+    @keyframes float { 0%{transform:translateY(0) translateX(0)} 100%{transform:translateY(-30px) translateX(20px)} }
+
+    
+
+    /* ===== Layout ===== */
+    .container{width:min(1100px, 92vw); margin:0 auto; padding:24px}
+
+    .nav{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px}
+    .logo{width:36px; height:36px; border-radius:12px; background:
+      radial-gradient(circle at 30% 30%, var(--brand), transparent 55%),
+      radial-gradient(circle at 70% 70%, var(--brand2), transparent 55%),
+      linear-gradient(135deg, #0a0a0f, #0c0c12);
+      box-shadow: var(--glow), inset 0 0 12px rgba(255,255,255,.08);
+    }
+    .nav a.btn{
+      padding:10px 14px; border:1px solid var(--border); border-radius:12px; color:var(--fg);
+      transition:.25s transform,.25s box-shadow,.25s border-color;
+    }
+    .nav a.btn:hover{ transform:translateY(-2px); box-shadow:var(--glow); border-color:#2a2a33; }
+
+    /* ===== Hero ===== */
+    .hero{padding:72px 0 36px; text-align:center; position:relative}
+    .eyebrow{display:inline-block; font-size:.9rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase;}
+    .title{font-family:"Space Grotesk", Inter, system-ui; font-size:clamp(2rem, 6vw, 3.5rem); line-height:1.08; margin:14px 0 10px;
+      background:linear-gradient(90deg, #fff, #d9f9ff 35%, #e7ddff 65%, #fff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 0 0 rgba(0,0,0,0);
+    }
+    .subtitle{color:var(--muted); font-weight:400; font-size:1.05rem}
+
+    .hero-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-top:26px}
+    .stat{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      border:1px solid var(--border); border-radius:var(--radius); padding:16px; backdrop-filter: blur(6px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .stat .num{font-family:"Space Grotesk"; font-weight:700; font-size:1.8rem}
+    .stat .label{color:var(--muted); font-size:.9rem}
+
+    /* ===== Sections ===== */
+    section{margin:40px 0}
+    .grid{display:grid; grid-template-columns:repeat(12, 1fr); gap:16px}
+    .card{grid-column: span 12; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden;
+    }
+    .card h3{margin:0 0 10px; font-family:"Space Grotesk"}
+    .card p{margin:0; color:var(--fg)}
+    .muted{color:var(--muted)}
+    @media (min-width:780px){
+      .col-6{grid-column: span 6}
+      .col-4{grid-column: span 4}
+      .col-8{grid-column: span 8}
+    }
+
+    /* ===== Animated Accents ===== */
+    .ring{
+      position:absolute; inset:auto -20% -60% -20%; height:300px; pointer-events:none; opacity:.18;
+      background: radial-gradient(closest-side, rgba(0,229,255,.35), transparent 70%);
+      filter:blur(12px); animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+    /* ===== Buttons ===== */
+    .cta{
+      display:inline-flex; align-items:center; gap:10px; margin-top:16px; padding:12px 16px; border-radius:14px;
+      border:1px solid var(--border); background:#0b0b12; box-shadow:var(--glow);
+      transition:.25s transform,.25s box-shadow; font-weight:600;
+    }
+    .cta:hover{ transform:translateY(-2px) }
+
+    /* ===== Reveal on scroll ===== */
+    .reveal{opacity:0; transform:translateY(16px); transition: opacity .6s ease, transform .6s ease}
+    .reveal.show{opacity:1; transform:none}
+
+    /* Accessibility: reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .aurora, .stars, .twinkle, .ring{animation:none}
+      .reveal{transition:none}
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="twinkle"></div>
+    <div class="aurora"></div>
+  </div>
+
+  <header class="container nav">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <span>EVIoT Predict</span>
+    </div>
+    <nav>
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="#contact">Contact</a>
+      <a class="btn" href="#dataset">Dataset</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <span class="eyebrow">About the Project</span>
+      <h1 class="title">Predictive Maintenance for EVs — Failure Probability & Smart Service</h1>
+      <p class="subtitle">EVIoT Predict transforms raw EV telemetry into early warnings. 
+        It estimates <strong>Failure Probability</strong>, suggests <strong>Maintenance Type</strong>, and provides <strong>RUL/TTF</strong> guidance.
+      </p>
+
+      <div class="hero-stats reveal">
+        <div class="stat">
+          <div class="num">5 yrs</div>
+          <div class="label">Historical IoT data</div>
+        </div>
+        <div class="stat">
+          <div class="num">15‑min</div>
+          <div class="label">Telemetry intervals</div>
+        </div>
+        <div class="stat">
+          <div class="num">8+</div>
+          <div class="label">Feature groups</div>
+        </div>
+        <div class="stat">
+          <div class="num">4 tasks</div>
+          <div class="label">Binary • Multiclass • RUL • TTF</div>
+        </div>
+      </div>
+      <a class="cta" href="/">← Back to App</a>
+      <div class="ring"></div>
+    </section>
+
+    <section class="grid" aria-label="Overview">
+      <article class="card col-8 reveal">
+        <h3>What it predicts</h3>
+        <p>
+          • <strong>Failure Probability</strong> (binary risk)
+          • <strong>Maintenance Type</strong> (multiclass)
+          • <strong>RUL</strong> — Remaining Useful Life (regression)
+          • <strong>TTF</strong> — Time To Failure (regression)
+        </p>
+        <p class="muted">Designed to improve uptime, safety, and service planning.
+        </p>
+      </article>
+      <article class="card col-4 reveal">
+        <h3>Tech Stack</h3>
+        <p>Flask • Scikit‑learn / XGBoost • Pandas • NumPy • HTML/CSS/JS</p>
+        <p class="muted">Modular pipelines for preprocessing, training, and inference.</p>
+      </article>
+    </section>
+
+    <section id="dataset" class="grid" aria-label="Dataset">
+      <article class="card col-6 reveal">
+        <h3>Dataset</h3>
+        <p>EVIoT‑PredictiveMaint dataset: IoT‑enabled EVs, 15‑minute intervals over 5 years.
+           8+ feature groups covering load, temperature, vibration, usage patterns, and environment.</p>
+        <p class="muted">Curated for predictive maintenance research and production prototypes.</p>
+      </article>
+      <article class="card col-6 reveal">
+        <h3>Method</h3>
+        <p>Feature engineering • Class rebalancing • Model selection (RF, XGB, etc.) • Cross‑validation • Calibration.
+           Separate pipelines for classification and regression targets with tracked metrics.</p>
+        <p class="muted">Deployable via REST endpoints in Flask.</p>
+      </article>
+    </section>
+
+    <section class="grid" aria-label="Key Features">
+      <article class="card col-4 reveal">
+        <h3>Live Risk Scoring</h3>
+        <p>Compute risk from real‑time telemetry to prevent sudden breakdowns.</p>
+      </article>
+      <article class="card col-4 reveal">
+        <h3>Smart Maintenance</h3>
+        <p>Recommends maintenance type and timing using learned patterns.</p>
+      </article>
+      <article class="card col-4 reveal">
+        <h3>Explainability</h3>
+        <p>Feature importances and trend views to justify predictions.</p>
+      </article>
+    </section>
+
+    <section class="grid" aria-label="Results">
+      <article class="card col-6 reveal">
+        <h3>Model Metrics (sample)</h3>
+        <p>Failure (binary): Accuracy ~90% • Precision/Recall tracked with class balance.
+        </p>
+        <p class="muted">Confusion matrix & ROC‑AUC available in the dashboard.</p>
+      </article>
+      <article class="card col-6 reveal">
+        <h3>Responsible AI</h3>
+        <p>Data privacy by design. Monitoring for drift. Human‑in‑the‑loop for critical actions.</p>
+        <p class="muted">Supports audit logs and opt‑outs.</p>
+      </article>
+    </section>
+
+    <section id="contact" class="grid" aria-label="Contact">
+      <article class="card reveal">
+        <h3>Contact</h3>
+        <p>Have feedback or want to collaborate? Reach out at <a href="mailto:team@eviot-predict.example">team@eviot-predict.example</a>.</p>
+        <p class="muted">© <span id="year"></span> EVIoT Predict</p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    // Intersection Observer reveal
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
