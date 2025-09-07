@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Register - EVIoT Predict{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    .auth-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .auth-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-header p {
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .auth-body {
+        padding: 2rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating .form-control {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        height: auto;
+    }
+    
+    .form-floating .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+    
+    .form-floating label {
+        padding: 1rem 0.75rem;
+        color: var(--secondary-color);
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+    
+    .login-link {
+        text-align: center;
+        color: var(--secondary-color);
+    }
+    
+    .login-link a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 0.25rem;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .strength-weak { background: var(--danger-color); width: 25%; }
+    .strength-fair { background: var(--warning-color); width: 50%; }
+    .strength-good { background: #3b82f6; width: 75%; }
+    .strength-strong { background: var(--success-color); width: 100%; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-user-plus me-2"></i>Create Account</h1>
+            <p>Join EVIoT Predict and start predicting EV failures</p>
+        </div>
+        
+        <div class="auth-body">
+            <form method="POST" id="registerForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required>
+                            <label for="first_name"><i class="fas fa-user me-2"></i>First Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" required>
+                            <label for="last_name"><i class="fas fa-user me-2"></i>Last Name</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    <label for="username"><i class="fas fa-at me-2"></i>Username</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                    <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <small id="strengthText" class="text-muted">Enter a password</small>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                    <label for="confirm_password"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+                </div>
+                
+                <button type="submit" class="btn btn-register">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    // Password strength checker
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        
+        strengthFill.className = 'strength-fill ' + strength.class;
+        strengthText.textContent = strength.text;
+        strengthText.className = 'text-muted ' + strength.textClass;
+    });
+    
+    // Password confirmation checker
+    confirmPasswordInput.addEventListener('input', function() {
+        const password = passwordInput.value;
+        const confirmPassword = this.value;
+        
+        if (confirmPassword && password !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+            this.classList.add('is-invalid');
+        } else {
+            this.setCustomValidity('');
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = [];
+        
+        if (password.length >= 8) score++;
+        else feedback.push('at least 8 characters');
+        
+        if (/[a-z]/.test(password)) score++;
+        else feedback.push('lowercase letters');
+        
+        if (/[A-Z]/.test(password)) score++;
+        else feedback.push('uppercase letters');
+        
+        if (/[0-9]/.test(password)) score++;
+        else feedback.push('numbers');
+        
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        else feedback.push('special characters');
+        
+        if (score < 2) {
+            return { class: 'strength-weak', text: 'Weak password', textClass: 'text-danger' };
+        } else if (score < 3) {
+            return { class: 'strength-fair', text: 'Fair password', textClass: 'text-warning' };
+        } else if (score < 4) {
+            return { class: 'strength-good', text: 'Good password', textClass: 'text-info' };
+        } else {
+            return { class: 'strength-strong', text: 'Strong password', textClass: 'text-success' };
+        }
+    }
+});
+</script>
+{% endblock %}

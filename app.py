@@ -1,13 +1,73 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import numpy as np
 import joblib
 import os
-
+import json
+from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key"  # for flash messages
+app.secret_key = "dev-secret-key-change-in-production"  # for flash messages
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ev_predict.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize extensions
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+login_manager.login_message_category = 'info'
+
+# Define models directly in app.py to avoid circular imports
+class User(UserMixin, db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    def set_password(self, password):
+        """Hash and set the password"""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check if provided password matches the hash"""
+        return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+class PredictionHistory(db.Model):
+    __tablename__ = 'prediction_history'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    prediction_type = db.Column(db.String(50), nullable=False)  # 'form' or 'file'
+    prediction_result = db.Column(db.Text, nullable=False)  # JSON string
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref=db.backref('predictions', lazy=True))
+    
+    def __repr__(self):
+        return f'<PredictionHistory {self.id}>'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Initialize database tables
+def init_db():
+    with app.app_context():
+        db.create_all()
+        print("✅ Database tables created/verified")
 
 # Load Random Forest model and training metadata once at startup
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "saved_models", "best_model_random_forest.joblib")
@@ -86,14 +146,12 @@ def preprocess_input(df_in: pd.DataFrame) -> pd.DataFrame:
 
 @app.route("/")
 def index():
-    # Use existing index.html if present; otherwise fall back to predict page
-    try:
-        return render_template("index.html")
-    except Exception:
-        return redirect(url_for("predict"))
+    return render_template("index.html")
+   
 
 
 @app.route("/predict", methods=["GET", "POST"])
+@login_required
 def predict():
     if request.method == "GET":
         return render_template("predict.html", table_html=None, metrics=None)
@@ -152,6 +210,7 @@ def predict():
 
 
 @app.route("/form", methods=["GET", "POST"])
+@login_required
 def form_predict():
     if model is None or scaler is None or base_df is None:
         flash("Model, scaler, or base dataset not available. Please check server logs.")
@@ -260,13 +319,142 @@ def api_info():
     return jsonify(info)
 
 
+# Authentication Routes
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
+    
+    # Handle registration
+    username = request.form.get("username", "").strip()
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm_password", "")
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    
+    # Validation
+    errors = []
+    
+    if not username or len(username) < 3:
+        errors.append("Username must be at least 3 characters long.")
+    
+    if not email or "@" not in email:
+        errors.append("Please enter a valid email address.")
+    
+    if not password or len(password) < 6:
+        errors.append("Password must be at least 6 characters long.")
+    
+    if password != confirm_password:
+        errors.append("Passwords do not match.")
+    
+    if not first_name or not last_name:
+        errors.append("First name and last name are required.")
+    
+    # Check if user already exists
+    if User.query.filter_by(username=username).first():
+        errors.append("Username already exists.")
+    
+    if User.query.filter_by(email=email).first():
+        errors.append("Email already registered.")
+    
+    if errors:
+        for error in errors:
+            flash(error, "error")
+        return render_template("register.html")
+    
+    # Create new user
+    try:
+        user = User(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name
+        )
+        user.set_password(password)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash("Registration successful! Please log in.", "success")
+        return redirect(url_for("login"))
+    
+    except Exception as e:
+        db.session.rollback()
+        flash("Registration failed. Please try again.", "error")
+        return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    
+    # Handle login
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "")
+    remember = bool(request.form.get("remember"))
+    
+    if not username or not password:
+        flash("Please enter both username and password.", "error")
+        return render_template("login.html")
+    
+    user = User.query.filter_by(username=username).first()
+    
+    if user and user.check_password(password):
+        if user.is_active:
+            login_user(user, remember=remember)
+            flash(f"Welcome back, {user.first_name}!", "success")
+            
+            # Redirect to next page or dashboard
+            next_page = request.args.get("next")
+            return redirect(next_page) if next_page else redirect(url_for("index"))
+        else:
+            flash("Your account has been deactivated.", "error")
+    else:
+        flash("Invalid username or password.", "error")
+    
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("You have been logged out successfully.", "info")
+    return redirect(url_for("index"))
+
+
+@app.route("/profile")
+@login_required
+def profile():
+    # Get user's prediction history
+    predictions = PredictionHistory.query.filter_by(user_id=current_user.id)\
+        .order_by(PredictionHistory.created_at.desc()).limit(10).all()
+    
+    return render_template("profile.html", predictions=predictions)
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
 if __name__ == "__main__":
     print("🚀 Starting EV Predictive Maintenance Flask App...")
     print("📊 Model: Random Forest (Failure Probability Prediction)")
     print("🔗 Available endpoints:")
     print("   - / : Home page")
-    print("   - /predict : File upload prediction")
-    print("   - /form : Manual input prediction")
+    print("   - /register : User registration")
+    print("   - /login : User login")
+    print("   - /logout : User logout")
+    print("   - /profile : User profile")
+    print("   - /predict : File upload prediction (requires login)")
+    print("   - /form : Manual input prediction (requires login)")
     print("   - /api/predict : API endpoint")
     print("   - /api/info : Model information")
+    
+    # Initialize database after all models are loaded
+    init_db()
+    
     app.run(debug=True)

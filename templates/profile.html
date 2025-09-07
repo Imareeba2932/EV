@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - EVIoT Predict{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+    
+    .prediction-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .prediction-type {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .prediction-result {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+    }
+    
+    .prediction-date {
+        font-size: 0.8rem;
+        color: var(--secondary-color);
+        margin-top: 0.5rem;
+    }
+    
+    .no-predictions {
+        text-align: center;
+        padding: 3rem;
+        color: var(--secondary-color);
+    }
+    
+    .no-predictions i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">User Profile</h1>
+    <p class="page-subtitle">Manage your account and view prediction history</p>
+</div>
+
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-4 mb-4">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3>{{ current_user.first_name }} {{ current_user.last_name }}</h3>
+            <p class="mb-1">{{ current_user.email }}</p>
+            <small>Member since {{ current_user.created_at.strftime('%B %Y') }}</small>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-4"><strong>Username:</strong></div>
+                    <div class="col-8">{{ current_user.username }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4"><strong>Email:</strong></div>
+                    <div class="col-8">{{ current_user.email }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4"><strong>Status:</strong></div>
+                    <div class="col-8">
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4"><strong>Joined:</strong></div>
+                    <div class="col-8">{{ current_user.created_at.strftime('%B %d, %Y') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics and History -->
+    <div class="col-lg-8">
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ predictions|length }}</div>
+                    <div class="stats-label">Total Predictions</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ predictions|selectattr('prediction_type', 'equalto', 'form')|list|length }}</div>
+                    <div class="stats-label">Manual Inputs</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ predictions|selectattr('prediction_type', 'equalto', 'file')|list|length }}</div>
+                    <div class="stats-label">File Uploads</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Prediction History -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Predictions</h5>
+            </div>
+            <div class="card-body">
+                {% if predictions %}
+                    {% for prediction in predictions %}
+                    <div class="prediction-item">
+                        <div class="prediction-type">
+                            <i class="fas fa-{{ 'edit' if prediction.prediction_type == 'form' else 'upload' }} me-1"></i>
+                            {{ prediction.prediction_type.title() }} Prediction
+                        </div>
+                        <div class="prediction-result">
+                            {{ prediction.prediction_result[:100] }}{% if prediction.prediction_result|length > 100 %}...{% endif %}
+                        </div>
+                        <div class="prediction-date">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ prediction.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-predictions">
+                        <i class="fas fa-chart-line"></i>
+                        <h5>No predictions yet</h5>
+                        <p>Start making predictions to see your history here.</p>
+                        <a href="{{ url_for('form_predict') }}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Make a Prediction
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

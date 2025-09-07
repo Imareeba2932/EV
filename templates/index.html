@@ -1,418 +1,348 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>index - Predictive Maintenance for EVs</title>
+{% block title %}EVIoT Predict - Predictive Maintenance for Electric Vehicles{% endblock %}
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&display=swap');
-
-    body {
-      font-family: 'Source Sans Pro', sans-serif;
-      background: #f9fafb;
-      color: #222;
-      margin: 0;
-      padding: 0;
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 6rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
     }
-
-    h1, h2, h3 {
-      font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #222;
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
+        opacity: 0.1;
+        z-index: 0;
     }
-
-    /* Navbar */
-    nav.navbar {
-      background: #fff;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      padding: 1rem 2rem;
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
     }
-
-    nav .navbar-brand {
-      font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      font-size: 1.8rem;
-      color: #3b5998;
-      letter-spacing: 3px;
+    
+    .hero-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     }
-
-    nav .nav-link {
-      font-weight: 600;
-      color: #444;
-      transition: color 0.3s ease;
-      letter-spacing: 1px;
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
     }
-
-    nav .nav-link:hover {
-      color: #007bff;
-      text-decoration: underline;
+    
+    .hero-buttons {
+        margin-top: 2rem;
     }
-
-    /* Parallax Sections */
-    .parallax {
-      position: relative;
-      background-attachment: fixed;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      color: white;
-      text-align: center;
-      padding: 8rem 2rem;
-      user-select: none;
+    
+    .hero-buttons .btn {
+        margin: 0.5rem;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
     }
-
-    .parallax h2 {
-      font-size: 3rem;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-      margin-bottom: 0.5rem;
+    
+    .feature-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 100%;
     }
-
-    .parallax .subheading {
-      font-size: 1.3rem;
-      font-weight: 400;
-      letter-spacing: 3px;
-      text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.6);
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
     }
-
-    /* Content Blocks */
-    .content-block {
-      max-width: 900px;
-      margin: 3rem auto;
-      background: white;
-      padding: 3rem 2rem;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
-      text-align: center;
-    }
-
-    .content-block p {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: #444;
-      margin-top: 1rem;
-    }
-
-    /* Cards Section */
-    .cards-container {
-      max-width: 1100px;
-      margin: 3rem auto 5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: center;
-    }
-
-    .card-custom {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
-      padding: 2rem;
-      flex: 1 1 300px;
-      max-width: 320px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      text-align: center;
-    }
-
-    .card-custom:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgb(0 0 0 / 0.15);
-    }
-
-    .card-custom i {
-      font-size: 3.5rem;
-      color: #007bff;
-      margin-bottom: 1rem;
-    }
-
-    .card-custom h3 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      color: #222;
-    }
-
-    .card-custom p {
-      font-size: 1rem;
-      color: #555;
-      line-height: 1.5;
-    }
-footer {
-    background: #111;
-    color: #eee;
-    padding: 40px 0;
-    font-family: Arial, sans-serif;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    max-width: 1100px;
-    margin: auto;
-    flex-wrap: wrap;
-}
-
-.footer-section {
-    flex: 1;
-    min-width: 200px;
-    margin: 10px;
-}
-
-.footer-section h3 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #00ff99; /* highlight color */
-}
-
-.footer-section ul {
-    list-style: none;
-    padding: 0;
-}
-
-.footer-section ul li {
-    margin-bottom: 8px;
-}
-
-.footer-section ul li a {
-    color: #eee;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.footer-section ul li a:hover {
-    color: #00ff99;
-    text-decoration: underline;
-}
-
-footer p {
-    text-align: center;
-    margin-top: 20px;
-    border-top: 1px solid #333;
-    padding-top: 15px;
-    font-size: 14px;
-    color: #aaa;
-}
-
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .parallax h2 {
-        font-size: 2.2rem;
-      }
-
-      .cards-container {
-        flex-direction: column;
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border-radius: 50%;
+        display: flex;
         align-items: center;
-      }
-
-      .card-custom {
-        max-width: 90%;
-      }
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
     }
-  </style>
-</head>
+    
+    .stats-section {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 4rem 0;
+        margin: 4rem 0;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 4rem 0;
+        text-align: center;
+    }
+    
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+{% endblock %}
 
-<body>
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
     <div class="container">
-      <a class="navbar-brand" href="/">EVIoT Predict</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="/">\index.html</a></li>
-          <li class="nav-item"><a class="nav-link active" href="\ab.html">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-          <li class="nav-item"><a class="nav-link" href="/team">Dashboard</a></li>
-        </ul>
-      </div>
+        <div class="hero-content">
+            <h1 class="hero-title">EVIoT Predict</h1>
+            <p class="hero-subtitle">Advanced Predictive Maintenance for Electric Vehicles</p>
+            <p class="lead">Transform raw EV telemetry into actionable insights with machine learning-powered failure prediction</p>
+            
+            <div class="hero-buttons">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('form_predict') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-edit me-2"></i>Make Prediction
+                </a>
+                <a href="{{ url_for('predict') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-upload me-2"></i>Upload CSV
+                </a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-  </nav>
+</div>
 
-  <!-- Hero Parallax -->
-  <section class="parallax" style="background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240909/pngtree-car-engineers-working-on-electric-vehicle-platform-design-in-an-advanced-image_16140030.jpg');">
-    <h2>Predictive Maintenance for EVs</h2>
-    <p class="subheading">Failure Probability & Smart Service</p>
-  </section>
+<!-- Features Section -->
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="page-title">Key Features</h2>
+            <p class="page-subtitle">Comprehensive predictive maintenance solution for electric vehicles</p>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h4>Failure Prediction</h4>
+                <p>Binary risk prediction to identify potential failures early using advanced machine learning algorithms.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h4>Smart Maintenance</h4>
+                <p>Multiclass classification to recommend the right maintenance action at the optimal time.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h4>RUL & TTF</h4>
+                <p>Regression models estimating Remaining Useful Life and Time To Failure for components.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h4>IoT Integration</h4>
+                <p>Processes real-time telemetry data from electric vehicle sensors and IoT devices.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>User Authentication</h4>
+                <p>Secure user management with role-based access and prediction history tracking.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h4>Responsive Design</h4>
+                <p>Modern, mobile-friendly interface that works seamlessly across all devices.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-  <!-- About Content -->
-  <section class="content-block">
-    <p>
-      EVIoT Predict is a data-driven predictive maintenance solution built for electric vehicles. It specializes in estimating the probability of component failure using IoT-enabled telemetry data such as voltage, temperature, and vibration. By providing accurate, early warnings, the system helps minimize unexpected breakdowns, reduce downtime, and enhance overall fleet reliability    </p>
-  </section>
-
-  <!-- Stats Cards -->
-  <section class="cards-container" aria-label="Project statistics">
-    <div class="card-custom" role="region" aria-labelledby="stat1-label">
-      <i class="fa-solid fa-database"></i>
-      <h3 id="stat1-label">5 Years</h3>
-      <p>Historical IoT data</p>
-    </div>
-    <div class="card-custom" role="region" aria-labelledby="stat2-label">
-      <i class="fa-solid fa-clock"></i>
-      <h3 id="stat2-label">15 Minutes</h3>
-      <p>Telemetry intervals</p>
-    </div>
-    <div class="card-custom" role="region" aria-labelledby="stat3-label">
-      <i class="fa-solid fa-layer-group"></i>
-      <h3 id="stat3-label">8+</h3>
-      <p>Feature groups</p>
-    </div>
-    <div class="card-custom" role="region" aria-labelledby="stat4-label">
-      <i class="fa-solid fa-tasks"></i>
-      <h3 id="stat4-label">4 Tasks</h3>
-      <p>Binary • Multiclass • RUL • TTF</p>
-    </div>
-  </section>
-
-  <!-- Features Parallax -->
-  <section class="parallax" style="background-image: url('https://www.shutterstock.com/image-photo/interior-autonomous-car-driverless-vehicle-260nw-2190776531.jpg');">
-    <h2>Smart Maintenance & Live Risk Scoring</h2>
-    <p class="subheading">Prevent sudden breakdowns with real-time telemetry analysis</p>
-  </section>
-
-  <!-- Features Cards -->
-  <section class="cards-container" aria-label="Key features">
-    <div class="card-custom">
-      <i class="fa-solid fa-chart-line"></i>
-      <h3>Failure Probability</h3>
-      <p>Binary risk prediction to identify potential failures early.</p>
-    </div>
-    <div class="card-custom">
-      <i class="fa-solid fa-tools"></i>
-      <h3>Maintenance Type</h3>
-      <p>Multiclass classification to recommend the right maintenance action.</p>
-    </div>
-    <div class="card-custom">
-      <i class="fa-solid fa-hourglass-half"></i>
-      <h3>Remaining Useful Life (RUL)</h3>
-      <p>Regression model estimating how long components will last.</p>
-    </div>
-    <div class="card-custom">
-      <i class="fa-solid fa-bolt"></i>
-      <h3>Time To Failure (TTF)</h3>
-      <p>Predicts the time remaining before failure occurs.</p>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section class="content-block">
-    <h2>Future Scope</h2>
-    <p>EVIoT Predict is a data-driven predictive maintenance solution built for electric vehicles. It specializes in estimating the probability of component failure using IoT-enabled telemetry data such as voltage, temperature, and vibration. By providing accurate, early warnings, the system helps minimize unexpected breakdowns, reduce downtime, and enhance overall fleet reliability</p>
-  </section>
-  <section class="content-block">
-    <h2>Contact</h2>
-    <!-- End Col -->
-                        
-                        <div class="space-y-6 lg:space-y-10">
-                            <div>
-                            <p class="mb-5 text-black not-italic">
-                                Our address
-                            </p>
-                            <!-- Grid -->
-                            <div class="grid sm:grid-cols-2 gap-4 sm:gap-6 md:gap-3 lg:gap-">
-                                <div class="flex gap-4">
-                                <svg class="shrink-0 size-5 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                <div class="grow">
-                                    <p class="text-sm text-gray-600 text-black">
-                                    India
-                                    </p>
-                                    <address class="mt-1 text-black not-italic :text-white"as>
-                                    190/3 mashakgunj Street, Mohan laal House<br>
-                                    Glasgow G2 4JR
-                                    </address>
-                                </div>
-                                </div>
-                            </div>
-                            <!-- End Grid -->
-                            </div>
-                            <div>
-                            <!-- Grid -->
-                            <div class="grid sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
-                                <div class="flex gap-4">
-                                <svg class="shrink-0 size-5 text-gray-500 dark:text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"></path><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"></path></svg>
-                                <div class="grow">
-                                    <p class="text-sm text-gray-600 :text-white">
-                                    Email us
-                                    </p>
-                                    <p>
-                                    <a class="relative inline-block font-medium text-black before:absolute before:bottom-0.5 before:start-0 before:-z-[1] before:w-full before:h-1 before:bg-lime-400 hover:before:bg-black focus:outline-none focus:before:bg-black :text-white dark:hover:before:bg-white dark:focus:before:bg-white" href="mailto:example@site.so">
-                                        EVIOT@gmail.com
-                                    </a>
-                                    </p>
-                                </div>
-                                </div>
-                                <div class="flex gap-4">
-                                <svg class="shrink-0 size-5 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                <div class="grow">
-                                    <p class="text-sm text-gray-600 dark:text-white">
-                                    Call us
-                                    </p>
-                                    <p>
-                                    <a class="relative inline-block font-medium text-black before:absolute before:bottom-0.5 before:start-0 before:-z-[1] before:w-full before:h-1 before:bg-lime-400 hover:before:bg-black focus:outline-none focus:before:bg-black dark:text-white dark:hover:before:bg-white dark:focus:before:bg-white" href="mailto:blikitsales@site.so">
-                                        +98 232 3434-001
-                                    </a>
-                                    </p>
-                                </div>
-                              </div>
-    <p>
-      Have feedback or want to collaborate? Reach out at
-      <a href="mailto:team@eviot-predict.example">team@eviot-predict.example</a>.
-    </p>
-  </section>
-
-  <!-- Footer -->
-   
-  <footer>
+<!-- Stats Section -->
+<div class="stats-section">
     <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Product</h3>
-                    <ul>
-                        <li><a href="#" onclick="showModal('features')">Features</a></li>
-                        <li><a href="#" onclick="showModal('pricing')">Pricing</a></li>
-                        <li><a href="#" onclick="showModal('demo')">Request Demo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Company</h3>
-                    <ul>
-                        <li><a href="#" onclick="showModal('about')">About Us</a></li>
-                        <li><a href="#" onclick="showModal('careers')">Careers</a></li>
-                        <li><a href="#" onclick="showModal('contact')">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="#" onclick="showModal('docs')">Documentation</a></li>
-                        <li><a href="#" onclick="showModal('support')">Support</a></li>
-                        <li><a href="#" onclick="showModal('blog')">Blog</a></li>
-                    </ul>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Years of Data</div>
                 </div>
             </div>
-    &copy; <span id="year"></span> EVIoT Predict. All rights reserved.
-  </footer>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">15min</div>
+                    <div class="stat-label">Telemetry Intervals</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">8+</div>
+                    <div class="stat-label">Feature Groups</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">90%+</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- How It Works Section -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2 class="page-title">How It Works</h2>
+            <p class="page-subtitle">Simple steps to get started with predictive maintenance</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h4>1. Create Account</h4>
+                <p>Sign up for a free account to access the prediction platform and start making predictions.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h4>2. Upload Data</h4>
+                <p>Upload your EV telemetry data via CSV file or enter parameters manually through our form.</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h4>3. Get Predictions</h4>
+                <p>Receive detailed failure probability predictions and maintenance recommendations instantly.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-  <script>
-    // Set current year in footer
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-</body>
-
-</html>
+<!-- CTA Section -->
+<div class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Get Started?</h2>
+        <p class="cta-subtitle">Join thousands of users already using EVIoT Predict for their electric vehicle maintenance needs</p>
+        
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-user-plus me-2"></i>Create Free Account
+        </a>
+        <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-info-circle me-2"></i>Learn More
+        </a>
+        {% else %}
+        <a href="{{ url_for('form_predict') }}" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-edit me-2"></i>Make Prediction
+        </a>
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-user me-2"></i>View Profile
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
