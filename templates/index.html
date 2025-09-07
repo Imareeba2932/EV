@@ -5,12 +5,16 @@
 {% block extra_css %}
 <style>
     .hero-section {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.8)), 
+                    url('https://images.unsplash.com/photo-1593941707882-a5bac6861d75?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
         color: white;
-        padding: 6rem 0;
+        padding: 8rem 0;
         text-align: center;
         position: relative;
         overflow: hidden;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
     }
     
     .hero-section::before {
@@ -20,39 +24,131 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
-        opacity: 0.1;
-        z-index: 0;
+        background: linear-gradient(45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+        z-index: 1;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%);
+        z-index: 2;
     }
     
     .hero-content {
         position: relative;
-        z-index: 1;
+        z-index: 10;
+        animation: fadeInUp 1s ease-out;
     }
     
     .hero-title {
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 700;
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 4.5rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        background: linear-gradient(45deg, #ffffff, #e0e7ff, #ffffff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: glow 2s ease-in-out infinite alternate;
     }
     
     .hero-subtitle {
-        font-size: 1.3rem;
-        margin-bottom: 2rem;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.95;
+        font-weight: 500;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-description {
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
         opacity: 0.9;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
     }
     
     .hero-buttons {
-        margin-top: 2rem;
+        margin-top: 3rem;
+        animation: fadeInUp 1s ease-out 0.5s both;
     }
     
     .hero-buttons .btn {
         margin: 0.5rem;
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
+        padding: 1.2rem 2.5rem;
+        font-size: 1.2rem;
         font-weight: 600;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .hero-buttons .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        pointer-events: none;
+    }
+    
+    .floating-icon {
+        position: absolute;
+        color: rgba(255, 255, 255, 0.1);
+        font-size: 2rem;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-icon:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-icon:nth-child(2) { top: 60%; left: 80%; animation-delay: 2s; }
+    .floating-icon:nth-child(3) { top: 30%; left: 70%; animation-delay: 4s; }
+    .floating-icon:nth-child(4) { top: 80%; left: 20%; animation-delay: 1s; }
+    .floating-icon:nth-child(5) { top: 10%; left: 50%; animation-delay: 3s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes glow {
+        from {
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        to {
+            text-shadow: 2px 2px 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+        }
     }
     
     .feature-card {
@@ -135,12 +231,52 @@
     }
     
     @media (max-width: 768px) {
+        .hero-section {
+            padding: 4rem 0;
+            min-height: 80vh;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-buttons .btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            margin: 0.3rem;
+        }
+        
+        .floating-icon {
+            font-size: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
         .hero-title {
             font-size: 2.5rem;
         }
         
         .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+        }
+        
+        .hero-description {
+            font-size: 1rem;
+        }
+        
+        .hero-buttons .btn {
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0;
         }
     }
 </style>
@@ -149,11 +285,24 @@
 {% block content %}
 <!-- Hero Section -->
 <div class="hero-section">
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <i class="fas fa-car-battery floating-icon"></i>
+        <i class="fas fa-microchip floating-icon"></i>
+        <i class="fas fa-chart-line floating-icon"></i>
+        <i class="fas fa-cogs floating-icon"></i>
+        <i class="fas fa-bolt floating-icon"></i>
+    </div>
+    
     <div class="container">
         <div class="hero-content">
             <h1 class="hero-title">EVIoT Predict</h1>
-            <p class="hero-subtitle">Advanced Predictive Maintenance for Electric Vehicles</p>
-            <p class="lead">Transform raw EV telemetry into actionable insights with machine learning-powered failure prediction</p>
+            <p class="hero-subtitle">Next-Generation Predictive Maintenance</p>
+            <p class="hero-description">
+                Harness the power of AI and machine learning to predict electric vehicle failures before they happen. 
+                Our advanced algorithms analyze real-time telemetry data to provide actionable insights, 
+                reduce downtime, and optimize maintenance schedules.
+            </p>
             
             <div class="hero-buttons">
                 {% if current_user.is_authenticated %}
@@ -165,7 +314,7 @@
                 </a>
                 {% else %}
                 <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
-                    <i class="fas fa-user-plus me-2"></i>Get Started
+                    <i class="fas fa-rocket me-2"></i>Get Started Free
                 </a>
                 <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
                     <i class="fas fa-sign-in-alt me-2"></i>Sign In
@@ -179,7 +328,7 @@
 <!-- Features Section -->
 <div class="container">
     <div class="row mb-5">
-        <div class="col-12 text-center mb-5">
+        <div class="col-12 text-center mb-5 mt-5">
             <h2 class="page-title">Key Features</h2>
             <p class="page-subtitle">Comprehensive predictive maintenance solution for electric vehicles</p>
         </div>
