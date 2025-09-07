@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - EVIoT Predict{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-card { background: #fff; border-radius: 16px; box-shadow: var(--shadow); padding: 1rem; }
+    .insight-card { background: linear-gradient(135deg, #f8fafc, #e2e8f0); border-radius: 16px; padding: 1.25rem; }
+    .insight-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: .5rem; }
+    .insight-item i { color: var(--primary-color); margin-top: 3px; }
+    .section-title { font-weight: 700; }
+    .plotly-holder { height: 420px; overflow: hidden; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Quick insights from the EV dataset</p>
+  </div>
+
+<!-- Load Plotly BEFORE embedded figure scripts so charts render correctly -->
+<script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="chart-card">
+      <h5 class="section-title"><i class="fas fa-wave-square me-2"></i>Failure probability distribution</h5>
+      <div class="plotly-holder">
+        {% if charts.hist_fp %}
+          {{ charts.hist_fp|safe }}
+        {% else %}
+          <p class="text-muted m-3">No suitable numeric column found for distribution.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="insight-card">
+      <h6 class="mb-3"><i class="fas fa-lightbulb me-2"></i>Insights</h6>
+      {% if insights %}
+        {% for tip in insights %}
+          <div class="insight-item"><i class="fas fa-check-circle"></i><span>{{ tip }}</span></div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">Insights will appear based on the dataset columns.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="chart-card">
+      <h5 class="section-title"><i class="fas fa-chart-line me-2"></i>Top correlated features</h5>
+      <div class="plotly-holder">
+        {% if charts.bar_corr %}
+          {{ charts.bar_corr|safe }}
+        {% else %}
+          <p class="text-muted m-3">Not enough numeric columns to compute correlations.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="chart-card">
+      <h5 class="section-title"><i class="fas fa-dot-circle me-2"></i>Relationship view</h5>
+      <div class="plotly-holder">
+        {% if charts.scatter %}
+          {{ charts.scatter|safe }}
+        {% else %}
+          <p class="text-muted m-3">Not enough data to plot scatter with trendline.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

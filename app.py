@@ -9,6 +9,7 @@ import os
 import json
 from datetime import datetime
 from functools import wraps
+import plotly.express as px
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key-change-in-production"  # for flash messages
@@ -439,6 +440,95 @@ def profile():
 def about():
     return render_template("about.html")
 
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    """Dashboard with clear, decision-friendly visuals and KPIs."""
+    charts = {"hist_fp": None, "bar_corr": None, "scatter": None}
+    insights = []
+    kpis = {"rows": 0, "mean_fp": None, "avg_batt": None, "avg_motor": None}
+
+    if base_df is not None and len(base_df) > 0:
+        df = base_df.copy()
+
+        # Parse timestamp if present
+        if "Timestamp" in df.columns:
+            with pd.option_context('mode.chained_assignment', None):
+                df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+
+        # KPIs
+        kpis["rows"] = int(len(df))
+        if "Failure_Probability" in df.columns:
+            fp = pd.to_numeric(df["Failure_Probability"], errors="coerce")
+            kpis["mean_fp"] = float(fp.mean(skipna=True)) if fp.notna().any() else None
+        if "Battery_Temperature" in df.columns:
+            bt = pd.to_numeric(df["Battery_Temperature"], errors="coerce")
+            kpis["avg_batt"] = float(bt.mean(skipna=True)) if bt.notna().any() else None
+        if "Motor_Temperature" in df.columns:
+            mt = pd.to_numeric(df["Motor_Temperature"], errors="coerce")
+            kpis["avg_motor"] = float(mt.mean(skipna=True)) if mt.notna().any() else None
+
+        # 1) Histogram of Failure_Probability (or first numeric)
+        hist_col = "Failure_Probability"
+        if hist_col not in df.columns:
+            num_cols = [c for c in df.select_dtypes(include=[np.number]).columns if df[c].notna().sum() > 0]
+            hist_col = num_cols[0] if num_cols else None
+        if hist_col:
+            series = pd.to_numeric(df[hist_col], errors="coerce")
+            hist_df = pd.DataFrame({hist_col: series}).dropna()
+            if len(hist_df) > 0:
+                fig_hist = px.histogram(
+                    hist_df, x=hist_col, nbins=30,
+                    title=f"Distribution of {hist_col}",
+                    labels={hist_col: hist_col, "count": "Count"}
+                )
+                fig_hist.update_traces(marker_color="#2563eb")
+                charts["hist_fp"] = fig_hist.to_html(full_html=False, include_plotlyjs='cdn')
+                insights.append(f"Median {hist_col}: {hist_df[hist_col].median():.2f}; spread indicates overall risk dispersion.")
+
+        # 2) Bar: Top correlations with Failure_Probability
+        if "Failure_Probability" in df.select_dtypes(include=[np.number]).columns:
+            num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+            num_cols = [c for c in num_cols if df[c].notna().sum() > 0]
+            if len(num_cols) >= 2:
+                corr = df[num_cols].corr()["Failure_Probability"].drop("Failure_Probability").dropna()
+                if not corr.empty:
+                    top_corr = corr.abs().sort_values(ascending=False).head(8)
+                    bar_df = top_corr.reset_index()
+                    bar_df.columns = ["Feature", "|Correlation| with Failure_Probability"]
+                    fig_bar = px.bar(
+                        bar_df,
+                        x="Feature",
+                        y="|Correlation| with Failure_Probability",
+                        title="Top drivers correlated with Failure_Probability",
+                    )
+                    fig_bar.update_traces(marker_color="#10b981")
+                    fig_bar.update_layout(xaxis_tickangle=-35)
+                    charts["bar_corr"] = fig_bar.to_html(full_html=False, include_plotlyjs='cdn')
+                    insights.append("Bar chart shows strongest linear relationships with risk. Higher bars = stronger influence.")
+
+        # 3) Scatter with trendline for an interpretable pair
+        x_cand = None
+        for c in ["Battery_Temperature", "Motor_Temperature", "Power_Consumption"]:
+            if c in df.columns:
+                x_cand = c
+                break
+        y_cand = "Failure_Probability" if "Failure_Probability" in df.columns else None
+        if x_cand and y_cand:
+            plot_df = df[[x_cand, y_cand]].apply(pd.to_numeric, errors="coerce").dropna()
+            if len(plot_df) > 2:
+                fig_scatter = px.scatter(
+                    plot_df, x=x_cand, y=y_cand,
+                    trendline="ols",
+                    title=f"{y_cand} vs {x_cand} (trendline)",
+                    labels={x_cand: x_cand, y_cand: y_cand}
+                )
+                fig_scatter.update_traces(marker=dict(color="#f59e0b", opacity=0.6))
+                charts["scatter"] = fig_scatter.to_html(full_html=False, include_plotlyjs='cdn')
+                insights.append(f"Trendline suggests how {y_cand} changes with {x_cand}.")
+
+    return render_template("dashboard.html", charts=charts, insights=insights, kpis=kpis)
 
 if __name__ == "__main__":
     print("🚀 Starting EV Predictive Maintenance Flask App...")
